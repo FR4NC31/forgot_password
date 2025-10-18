@@ -24,7 +24,3 @@ dist-ssr
 *.sw?
 
 .env
-
-.env.keys
-.env.local
-.env.*.local
