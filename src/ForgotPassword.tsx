@@ -9,10 +9,14 @@ const ForgotPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(120);
-  const [canResend, setCanResend] = useState(false);
-  const appScheme = "com.fr4nc.mlvst://"
+  const [canResend, setCanResend] = useState(false)
 
   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  const redirectToApp = () => {
+  // Try to open the app
+  window.location.href = "com.fr4nc.mlvst://";
+};
 
   useEffect(() => {
     if (step === "otp" && timer > 0) {
@@ -453,9 +457,7 @@ const ForgotPassword: React.FC = () => {
               </p>
 
               <a
-                onClick={() => {
-                    window.location.href = appScheme; // Redirect to mobile app
-                  }}
+                onClick={redirectToApp}
                 className="block w-full py-2 px-4 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition"
               >
                 Continue to Login
