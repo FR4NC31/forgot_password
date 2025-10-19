@@ -78,12 +78,22 @@ serve(async (req: Request) => {
       throw new Error("Invalid OTP");
     }
 
+    // Delete the OTP after successful verification
+    const { error: deleteError } = await supabase
+      .from("forgot_password_otps")
+      .delete()
+      .eq("email", email.toLowerCase());
+
+    if (deleteError) {
+      throw new Error("Failed to delete OTP after verification");
+    }
+
     // OTP is valid
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "OTP verified successfully" 
-      }), 
+      JSON.stringify({
+        success: true,
+        message: "OTP verified successfully"
+      }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

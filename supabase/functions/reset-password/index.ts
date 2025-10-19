@@ -29,14 +29,13 @@ serve(async (req: Request) => {
       throw new Error("Invalid authorization token");
     }
 
-    const { email, otp, newPassword } = await req.json() as { 
-      email?: string; 
-      otp?: string; 
-      newPassword?: string 
+    const { email, newPassword } = await req.json() as {
+      email?: string;
+      newPassword?: string
     };
-    
-    if (!email || !otp || !newPassword) {
-      throw new Error("Missing required fields: email, otp, or newPassword");
+
+    if (!email || !newPassword) {
+      throw new Error("Missing required fields: email or newPassword");
     }
 
     // Validate email format
@@ -50,42 +49,7 @@ serve(async (req: Request) => {
       throw new Error("Password must be at least 8 characters");
     }
 
-    // Validate OTP format (6 digits)
-    if (!/^\d{6}$/.test(otp)) {
-      throw new Error("Invalid OTP format");
-    }
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-    // Verify OTP one more time
-    const { data: otpRecord, error: fetchError } = await supabase
-      .from("forgot_password_otps")
-      .select("otp, expires_at")
-      .eq("email", email.toLowerCase())
-      .single();
-
-    if (fetchError || !otpRecord) {
-      throw new Error("OTP not found or has expired");
-    }
-
-    // Check if OTP has expired
-    const now = new Date();
-    const expiresAt = new Date(otpRecord.expires_at);
-    
-    if (now > expiresAt) {
-      // Delete expired OTP
-      await supabase
-        .from("forgot_password_otps")
-        .delete()
-        .eq("email", email.toLowerCase());
-      
-      throw new Error("OTP has expired");
-    }
-
-    // Verify OTP matches
-    if (otpRecord.otp !== otp) {
-      throw new Error("Invalid OTP");
-    }
 
     // Get user by email
     const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers();
@@ -109,12 +73,6 @@ serve(async (req: Request) => {
     if (updateError) {
       throw new Error(`Failed to update password: ${updateError.message}`);
     }
-
-    // Delete the OTP after successful password reset
-    await supabase
-      .from("forgot_password_otps")
-      .delete()
-      .eq("email", email.toLowerCase());
 
     return new Response(
       JSON.stringify({ 

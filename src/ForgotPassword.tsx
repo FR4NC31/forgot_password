@@ -203,10 +203,9 @@ const ForgotPassword: React.FC = () => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           },
-          body: JSON.stringify({ 
-            email, 
-            otp: otp.join(""),
-            newPassword 
+          body: JSON.stringify({
+            email,
+            newPassword
           }),
         }
       );
