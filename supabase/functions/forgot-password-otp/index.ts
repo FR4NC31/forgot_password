@@ -67,16 +67,14 @@ serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Check if user exists
-    const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers();
+    // Check if user exists in customer_profiles table
+    const { data: profile, error: getProfileError } = await supabase
+      .from("customer_profiles")
+      .select("email")
+      .eq("email", to.toLowerCase())
+      .single();
 
-    if (getUserError) {
-      throw new Error("Failed to verify user");
-    }
-
-    const user = users.find(u => u.email?.toLowerCase() === to.toLowerCase());
-
-    if (!user) {
+    if (getProfileError || !profile) {
       throw new Error("Email not registered");
     }
 
