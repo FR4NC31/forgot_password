@@ -10,6 +10,7 @@ const ForgotPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(120);
   const [canResend, setCanResend] = useState(false);
+  const appScheme = "com.fr4nc.mlvst://"
 
   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -452,7 +453,9 @@ const ForgotPassword: React.FC = () => {
               </p>
 
               <a
-                href="/login"
+                onClick={() => {
+                    window.location.href = appScheme; // Redirect to mobile app
+                  }}
                 className="block w-full py-2 px-4 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition"
               >
                 Continue to Login
