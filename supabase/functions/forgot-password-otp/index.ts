@@ -67,6 +67,19 @@ serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Check if user exists
+    const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers();
+
+    if (getUserError) {
+      throw new Error("Failed to verify user");
+    }
+
+    const user = users.find(u => u.email?.toLowerCase() === to.toLowerCase());
+
+    if (!user) {
+      throw new Error("Email not registered");
+    }
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString(); // 2 minutes
