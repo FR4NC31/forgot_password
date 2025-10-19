@@ -1,9 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
 
-const SUPABASE_URL = Deno.env.get("VITE_SUPABASE_URL")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const SUPABASE_ANON_KEY = Deno.env.get("VITE_SUPABASE_ANON_KEY")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,18 +17,6 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Verify authorization header
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      throw new Error("Missing authorization header");
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    
-    if (token !== SUPABASE_ANON_KEY && token !== SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Invalid authorization token");
-    }
-
     const { email, otp } = await req.json() as { email?: string; otp?: string };
     
     if (!email || !otp) {
@@ -102,13 +90,12 @@ serve(async (req: Request) => {
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    const status = message.includes("authorization") ? 401 : 400;
-    
+
     return new Response(
-      JSON.stringify({ success: false, error: message }), 
+      JSON.stringify({ success: false, error: message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status,
+        status: 400,
       }
     );
   }
