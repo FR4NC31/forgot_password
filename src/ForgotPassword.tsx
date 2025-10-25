@@ -447,7 +447,7 @@ const ForgotPassword: React.FC = () => {
         {step === "email" ? (
           <p className="text-sm text-center mt-6 text-gray-600">
             Remember your password?{" "}
-            <a href="/login" className="text-black hover:underline">
+            <a onClick={redirectToApp} className="text-black hover:underline">
               Sign in
             </a>
           </p>
